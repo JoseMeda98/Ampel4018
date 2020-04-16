@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4018.10">
+  <POU Name="MAIN" Id="{7bccf9a7-9ffe-4c91-99ba-7026c2c4b522}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	bLight:BOOL; //light enable
+	bLightR:BOOL; //turn on R
+	bLightG:BOOL; //turn on G
+	bLightB:BOOL; //turn on B
+	btnSwitch:BOOL; //button signal
+	iCounter:DINT; //non persistent turn on counter
+	fbTrig:R_TRIG;
+	btnText:STRING := 'On'; //text on the toggle button
+	iColor:INT:=1; //color choosed
+	iWidth:REAL; //line width 
+	btnVar:bool; //not used
+END_VAR
+
+VAR PERSISTENT  
+	iCounterP:DINT; //persistent turn on counter
+	iIntensity:REAL; //slider value
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[fbTrig(CLK:=btnSwitch);
+
+
+IF fbTrig.Q THEN
+	bLight:=NOT bLight;
+	IF bLight THEN
+		iCounter:=iCOunter+1;
+		iCounterP:=iCounterP+1;
+	END_IF
+END_IF
+
+IF bLight THEN
+	CASE iColor OF
+		1:
+		bLightR:=TRUE;
+		bLightG:=FALSE;
+		bLightB:=FALSE;
+		
+		2:
+		bLightR:=FALSE;
+		bLightG:=TRUE;
+		bLightB:=FALSE;
+		
+		3:
+		bLightR:=FALSE;
+		bLightG:=FALSE;
+		bLightB:=TRUE;
+		
+		ELSE
+		bLightR:=FALSE;
+		bLightG:=FALSE;
+		bLightB:=FALSE;			
+	END_CASE
+	btnText:='Off';
+	iWidth:=iIntensity;
+ELSE
+	//turn of the 3 lights
+	bLightR:=FALSE;
+	bLightG:=FALSE;
+	bLightB:=FALSE;	
+	btnText:='On';
+	iWidth:=0;
+END_IF
+
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
